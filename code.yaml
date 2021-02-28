@@ -1,0 +1,25 @@
+- hosts: all
+  tasks:
+          - name: "Install httpd"
+            package:
+                    name: "httpd"
+                    state: present
+          - name: "Copy the web pages"
+            copy:
+                    src: "/ansible_ws/practice/task11/index.html"
+                    dest: "/var/www/html/index.html"
+          - name: "Copy the Comfiguration file"
+            copy:
+                    src: "/ansible_ws/practice/task11/my.conf"
+                    dest: "/etc/httpd/conf.d/my.conf"
+            register: copy_task
+          - name: "Start Services"
+            service:
+                    name: "httpd"
+                    state: started
+            register: current_state
+          - name: "restart services"
+            service:
+                    name: "httpd"
+                    state: restarted
+            when: ( copy_task.changed ==true and current_state.changed ==false)
